@@ -23,8 +23,7 @@ func router(db *sql.DB) *gin.Engine {
 	router.GET("/", handlers.Hello)
 
 	router.GET("/customer", ch.GetAllCustomer)
-	router.POST("/customer", handlers.CreateCustomer)
-	router.GET("/customer/:id", handlers.GetCustomerID)
+	router.GET("/customer/:id", ch.GetCustomerByID)
 
 	// time api
 	rTime := router.Group("/api")

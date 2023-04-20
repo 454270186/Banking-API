@@ -3,7 +3,6 @@ package handlers
 import (
 	"RESTful/service"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -11,13 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-type Customer struct {
-	Name    string `json:"full_name" xml:"name"`
-	City    string `json:"city" xml:"city"`
-	ZipCode string `json:"zip_code" xml:"zipcode"`
-	Gender  string `json:"gender" xml:"gender"`
-}
 
 type CustomerHandler struct {
 	Service service.CustomerService
@@ -30,13 +22,9 @@ func Hello(ctx *gin.Context) {
 }
 
 func (ch *CustomerHandler) GetAllCustomer(ctx *gin.Context) {
-	// customer := []Customer{
-	// 	{"xiaofei", "China", "12345", "male"},
-	// 	{"erfei", "Chengdu", "6666", "male"},
-	// }
-	customer, err := ch.Service.GetAllCustomer()
-	if err != nil {
-		log.Fatal(err)
+	customer, appError := ch.Service.GetAllCustomer()
+	if appError != nil {
+		ctx.JSON(appError.Code, appError.AsMessage())
 	}
 
 	if ctx.GetHeader("Content-Type") == "application/json" {
@@ -46,14 +34,10 @@ func (ch *CustomerHandler) GetAllCustomer(ctx *gin.Context) {
 	}
 }
 
-func CreateCustomer(ctx *gin.Context) {
-	ctx.String(200, "Post request received...")
-}
+func (ch *CustomerHandler) GetCustomerByID(ctx *gin.Context) {
+	id := ctx.Param("id")
 
-func GetCustomerID(ctx *gin.Context) {
-	id := ctx.Params.ByName("id")
-
-	idInt, err := strconv.Atoi(id)
+	_, err := strconv.Atoi(id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "id must be a number",
@@ -61,9 +45,13 @@ func GetCustomerID(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, gin.H{
-		"id": idInt,
-	})
+	customer, appError := ch.Service.GetCustomerById(id)
+	if appError != nil {
+		//ctx.String(appError.Code, appError.Message)
+		ctx.JSON(appError.Code, appError.AsMessage())
+	} else {
+		ctx.JSON(200, customer)
+	}
 }
 
 func GetTime(ctx *gin.Context) {

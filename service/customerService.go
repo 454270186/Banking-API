@@ -1,9 +1,13 @@
 package service
 
-import "RESTful/domain"
+import (
+	"RESTful/domain"
+	"RESTful/errs"
+)
 
 type CustomerService interface {
-	GetAllCustomer() ([]domain.Customer, error)
+	GetAllCustomer() ([]domain.Customer, *errs.AppError)
+	GetCustomerById(id string) (*domain.Customer, *errs.AppError)
 }
 
 type DefaultCustomerService struct {
@@ -14,6 +18,10 @@ func NewCustomerService(repository domain.CustomerRepo) CustomerService {
 	return DefaultCustomerService{repository}
 }
 
-func (d DefaultCustomerService) GetAllCustomer() ([]domain.Customer, error) {
+func (d DefaultCustomerService) GetAllCustomer() ([]domain.Customer, *errs.AppError) {
 	return d.repo.FindAll()
+}
+
+func (d DefaultCustomerService) GetCustomerById(id string) (*domain.Customer, *errs.AppError) {
+	return d.repo.FindById(id)
 }

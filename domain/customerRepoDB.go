@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"RESTful/errs"
 	"database/sql"
 	"log"
 	"time"
@@ -38,7 +39,7 @@ func NewCustomerRepoDB(db *sql.DB) CustomerRepoDB {
 	return CustomerRepoDB{db}
 }
 
-func (cdb CustomerRepoDB) FindAll() ([]Customer, error) {
+func (cdb CustomerRepoDB) FindAll() ([]Customer, *errs.AppError) {
 	findAllSql := "Select * from customers"
 
 	rows, err := cdb.DB.Query(findAllSql)
@@ -53,12 +54,37 @@ func (cdb CustomerRepoDB) FindAll() ([]Customer, error) {
 		var createAt time.Time
 		err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.Birthday, &c.Status, &updatedAt, &createAt)
 		if err != nil {
-			log.Println("ERROR: while querying customer table: " + err.Error())
-			return nil, err
+			if err == sql.ErrNoRows {
+				log.Println("Error: while scan customer table")
+				return nil, errs.NewNotFoundError("Customers not found")
+			} else {
+				log.Println("Error: " + err.Error())
+				return nil, errs.NewInterError("unexpected database error")
+			}
 		}
 
 		customers = append(customers, c)
 	}
 
 	return customers, nil
+}
+
+func (cdb CustomerRepoDB) FindById(id string) (*Customer, *errs.AppError) {
+	var c Customer
+	var updatedAt time.Time
+	var createAt time.Time
+	byIdSql := "Select * from customers where id = $1"
+
+	row := cdb.DB.QueryRow(byIdSql, id)
+	err := row.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.Birthday, &c.Status, &createAt, &updatedAt)
+	if err != nil {
+		if (err == sql.ErrNoRows) {
+			return nil, errs.NewNotFoundError("customer not found")
+		} else {
+			log.Println("Error while find customer by id")
+			return nil, errs.NewInterError("unexpect database error")
+		}
+	}
+
+	return &c, nil
 }
