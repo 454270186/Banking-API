@@ -4,19 +4,20 @@ import (
 	"RESTful/domain"
 	"RESTful/handlers"
 	"RESTful/service"
+	"database/sql"
 
 	"github.com/gin-gonic/gin"
 )
 
 
-func router() *gin.Engine {
+func router(db *sql.DB) *gin.Engine {
 	router := gin.Default()
 
 	// ch := handlers.CustomerHandler{
 	// 	Service: service.NewCustomerService(domain.NewCustomerRepoStub()),
 	// }
 	ch := handlers.CustomerHandler{
-		Service: service.NewCustomerService(domain.NewCustomerRepoDB()),
+		Service: service.NewCustomerService(domain.NewCustomerRepoDB(db)),
 	}
 
 	router.GET("/", handlers.Hello)

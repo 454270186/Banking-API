@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"time"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 const maxOpenDbConn = 10
@@ -32,12 +34,7 @@ func NewDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func NewCustomerRepoDB() CustomerRepoDB {
-	db, err := NewDB()
-	if err != nil {
-		panic(err)
-	}
-
+func NewCustomerRepoDB(db *sql.DB) CustomerRepoDB {
 	return CustomerRepoDB{db}
 }
 
@@ -52,7 +49,9 @@ func (cdb CustomerRepoDB) FindAll() ([]Customer, error) {
 	customers := make([]Customer, 0)
 	for rows.Next() {
 		var c Customer
-		err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.Birthday, &c.Status)
+		var updatedAt time.Time
+		var createAt time.Time
+		err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.Birthday, &c.Status, &updatedAt, &createAt)
 		if err != nil {
 			log.Println("ERROR: while querying customer table: " + err.Error())
 			return nil, err
