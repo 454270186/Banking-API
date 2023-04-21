@@ -39,8 +39,18 @@ func NewCustomerRepoDB(db *sql.DB) CustomerRepoDB {
 	return CustomerRepoDB{db}
 }
 
-func (cdb CustomerRepoDB) FindAll() ([]Customer, *errs.AppError) {
-	findAllSql := "Select * from customers"
+func (cdb CustomerRepoDB) FindAll(status string) ([]Customer, *errs.AppError) {
+	var findAllSql string
+	if status == "active" {
+		findAllSql = "Select * from customers where status = true"
+	} else if status == "inactive" {
+		findAllSql = "Select * from customers where status = false"
+	} else if status == "" {
+		findAllSql = "Select * from customers"
+	} else {
+		log.Println("invalid status")
+		return nil, errs.NewNotFoundError("invalid status")
+	}
 
 	rows, err := cdb.DB.Query(findAllSql)
 	if err != nil {

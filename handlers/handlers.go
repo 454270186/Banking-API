@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"RESTful/errs"
 	"RESTful/service"
 	"fmt"
 	"net/http"
@@ -22,7 +23,14 @@ func Hello(ctx *gin.Context) {
 }
 
 func (ch *CustomerHandler) GetAllCustomer(ctx *gin.Context) {
-	customer, appError := ch.Service.GetAllCustomer()
+	status := ctx.Query("status")
+	if status != "active" && status != "inactive" && status != "" {
+		err := errs.NewNotFoundError("invalid status")
+		ctx.JSON(err.Code, err)
+		return
+	}
+
+	customer, appError := ch.Service.GetAllCustomer(status)
 	if appError != nil {
 		ctx.JSON(appError.Code, appError.AsMessage())
 	}
