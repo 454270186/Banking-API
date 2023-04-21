@@ -1,6 +1,9 @@
 package main
 
-import "RESTful/domain"
+import (
+	"RESTful/domain"
+	"RESTful/logger"
+)
 
 func main() {
 	DB, err := domain.NewDB()
@@ -11,5 +14,6 @@ func main() {
 
 	r := router(DB)
 
+	logger.Info("Starting listening on port 8080")
 	r.Run(":8080")
 }
