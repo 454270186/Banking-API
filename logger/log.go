@@ -27,3 +27,7 @@ func init() {
 func Info(msg string, fields ...zapcore.Field) {
 	log.Info(msg, fields...)
 }
+
+func Error(msg string, fields ...zapcore.Field) {
+	log.Error(msg, fields...)
+}
