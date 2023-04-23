@@ -14,11 +14,11 @@ type AccountHandler struct {
 }
 
 // NewAccount parse the account request from user side
-func (h AccountHandler) NewAccount(ctx *gin.Context) {
+func (h *AccountHandler) NewAccount(ctx *gin.Context) {
 	var request dto.NewAccountRequest
 	err := json.NewDecoder(ctx.Request.Body).Decode(&request)
 	if err != nil {
-		ctx.String(http.StatusBadRequest, err.Error())
+		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -30,4 +30,22 @@ func (h AccountHandler) NewAccount(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, account)
+}
+
+func (h *AccountHandler) MakeTransaction(ctx *gin.Context) {
+	var request dto.TransactionRequest
+	if err := json.NewDecoder(ctx.Request.Body).Decode(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, "bad request")
+		return
+	}
+
+	request.CustomerID = ctx.Param("id")
+	request.AccountID = ctx.Param("account_id")
+	
+	response, err := h.Service.MakeTransaction(request)
+	if err != nil {
+		ctx.JSON(err.Code, err.AsMessage())
+	}
+
+	ctx.JSON(http.StatusCreated, response)
 }

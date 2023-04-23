@@ -27,7 +27,8 @@ func router(db *sql.DB) *gin.Engine {
 
 	router.GET("/customer", ch.GetAllCustomer)
 	router.GET("/customer/:id", ch.GetCustomerByID)
-	router.POST("/customer/:id([0-9]+)/account", ah.NewAccount) // create a new account with given id
+	router.POST("/customer/:id/account", ah.NewAccount) // create a new account with given id
+	router.POST("/customer/:id/account/:account_id", ah.MakeTransaction)
 
 	// time api
 	rTime := router.Group("/api")
