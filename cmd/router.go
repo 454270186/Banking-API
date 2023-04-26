@@ -13,15 +13,17 @@ import (
 func router(db *sql.DB) *gin.Engine {
 	router := gin.Default()
 
-	// ch := handlers.CustomerHandler{
-	// 	Service: service.NewCustomerService(domain.NewCustomerRepoStub()),
-	// }
 	ch := handlers.CustomerHandler{
 		Service: service.NewCustomerService(domain.NewCustomerRepoDB(db)),
 	}
 	ah := handlers.AccountHandler{
 		Service: service.NewAccountService(domain.NewAccountRepoDB(db)),
 	}
+	am := AuthMiddleWare{
+		repo: domain.NewAuthRepo(),
+	}
+
+	router.Use(am.AuthMid())
 
 	router.GET("/", handlers.Hello)
 
