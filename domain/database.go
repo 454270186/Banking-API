@@ -1,10 +1,10 @@
 package domain
 
 import (
+	"RESTful/global"
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -17,19 +17,20 @@ const maxDbLifeTime = 5 * time.Minute
 var dbUser string
 var dbPassword string
 var dbHost string
-var dbPort string
+var dbPort int
 var dbName string
 
-func init() {
-	dbUser = os.Getenv("db_user")
-	dbPassword = os.Getenv("db_password")
-	dbHost = os.Getenv("db_host")
-	dbPort = os.Getenv("db_port")
-	dbName = os.Getenv("db_name")
+func initDB() {
+	dbUser = global.Settings.PostgresInfo.DBUser
+	dbPassword = global.Settings.PostgresInfo.DBPassword
+	dbHost = global.Settings.PostgresInfo.DBHost
+	dbPort = global.Settings.PostgresInfo.DBPort
+	dbName = global.Settings.PostgresInfo.DBName
 }
 
 func NewDB() (*sql.DB, error) {
-	dsn := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s", dbUser, dbPassword, dbHost, dbPort, dbName)
+	initDB()
+	dsn := fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s", dbUser, dbPassword, dbHost, dbPort, dbName)
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		log.Fatal(err)

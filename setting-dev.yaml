@@ -1,0 +1,11 @@
+# setting-dev.yaml
+name: "Banking API"
+port: 8080
+host: "localhost"
+
+postgres:
+  db_user: "postgres"
+  db_password: "2021110003"
+  db_host: "localhost"
+  db_port: 5432
+  db_name: "restful"

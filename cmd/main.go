@@ -2,16 +2,18 @@ package main
 
 import (
 	"RESTful/domain"
+	"RESTful/global"
+	"RESTful/initial"
 	"RESTful/logger"
-	"os"
 	"fmt"
+	"log"
 )
 
 var port string
 
 func init() {
-	port = os.Getenv("port")
-	fmt.Println("port is : " + port)
+	initial.InitialConfig()
+	port = fmt.Sprintf(":%d", global.Settings.Port)
 }
 
 func main() {
@@ -24,5 +26,6 @@ func main() {
 	r := router(DB)
 
 	logger.Info("Starting listening on port 8080")
+	log.Printf("%s starting listening on port %s\n", global.Settings.ProgramName, port)
 	r.Run(port)
 }
