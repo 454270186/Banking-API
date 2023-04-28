@@ -14,6 +14,19 @@
 - GET ```/customer/:id```: Get customer by id
 
 - POST ```/customer/:id/account```: Create a new account for customer with given id
+    - POST Request Body<br>
+    ```json
+    {
+        "account_type": "xxx",
+        "amount": xxx
+    }
+    ```
+    - Response
+    ```json
+    {
+        "account_id": xxx
+    }
+    ```
 
 - POST ```/customer/:id/account/:account_id```: Make a transaction for given account. 
 <br>

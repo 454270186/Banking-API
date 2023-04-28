@@ -19,7 +19,7 @@ func (am AuthMiddleWare) AuthMid() gin.HandlerFunc {
 		authHeader := ctx.Request.Header.Get("Authorization")
 
 		if authHeader == "" {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "missing token",
 			})
 			return
